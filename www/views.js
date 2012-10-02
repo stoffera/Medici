@@ -1,3 +1,13 @@
+/**
+* Medici
+* Copyright (c) 2012 Kristoffer Andersen
+* All right reserved
+*/
+
+/**
+* Thumb list / grid views
+* Manages the list of thumbnails
+*/
 var ThumbListView = Backbone.View.extend({
 	tagName: 'ul',
 	className: 'thumbnails',
@@ -39,7 +49,7 @@ var ThumbListView = Backbone.View.extend({
 	
 	renderSpinner : function() {
 		var spin = new Image();
-		spin.src = "spinnerLarge.gif";
+		spin.src = "img/spinner_large.gif";
 		$(spin).addClass('spinner');
 		this.$el.append(spin);
 	},
@@ -52,6 +62,10 @@ var ThumbListView = Backbone.View.extend({
 	}
 });
 
+/**
+* Single Thumb view
+* A single thumbnail related to a video
+*/
 var ThumbView = Backbone.View.extend({
 	tagName: 'li',
 	className: 'span3',
@@ -95,7 +109,7 @@ var ThumbView = Backbone.View.extend({
 		var title = $('<p></p>').text(this.model.get('title'));
 		var series = $('<small></small>').text(this.model.get('album'));
 		if (this.model.get('track')){
-			var track = $('<span></span>').addClass('badge').text(this.model.get('track'));
+			var track = $('<span></span>').addClass('badge badge-info').text(this.model.get('track'));
 			title.empty();
 			title.append(track);
 			title.append(" "+this.model.get('title'));
@@ -132,6 +146,13 @@ var ThumbView = Backbone.View.extend({
 	
 });
 
+/**
+* Folder List menu view
+* Manages the folders present at the active location
+* Also does the loading of view folders by changing the models of the
+* thumb list view.
+* Breadcrumbs are also managed from this class
+*/
 var FolderListView = Backbone.View.extend({
 	tagName: 'ul',
 	dirStack: null,

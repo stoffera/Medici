@@ -1,3 +1,13 @@
+/**
+* Medici
+* Copyright (c) 2012 Kristoffer Andersen
+* All right reserved
+*/
+
+/**
+* Model representation of a single video
+* Control fetching of metadata and cover art path
+*/
 var VideoModel = Backbone.Model.extend({
 	videoRegexp : new RegExp("\\.(mp4|m4v|mov)$"),
 	invalidRegexp : new RegExp("\\.(avi|flv|mkv)$"),
@@ -25,7 +35,7 @@ var VideoModel = Backbone.Model.extend({
 	loadMetadata : function() {
 		var cntxt = this;
 		var path = this.get('path');
-		$.getJSON("/metadata"+path+"/"+this.get("filename"),function(data){
+		$.getJSON(pathJoin("/metadata",path,this.get("filename")),function(data){
 			cntxt.set(data);
 		});
 	},
@@ -36,24 +46,14 @@ var VideoModel = Backbone.Model.extend({
 	
 	getCoverArtUrl : function() {
 		if (!this.hasCoverArt) return null;
-		return "/get_cover"+this.get('path')+'/'+this.get('filename');
+		return pathJoin("/get_cover",this.get('path'),this.get('filename'));
 	}
 });
 
-// var FolderModel = ParentModel.extend({
-// 	collection: null,
-// 	name: null,
-// 	initialize: function() {
-// 		console.log("init folder model: "+this.get('filename'));
-// 		this.name = this.get('filename');
-// 	},
-// 	fetch : function() {
-// 		if (this.collection == null) {
-// 			this.collection = new Folder();
-// 		}
-// 	}
-// });
-
+/**
+* Representation of a folder
+* Contains models fo each video. Including refernces to sub-folders
+*/
 var Folder = Backbone.Collection.extend({
 	model: VideoModel,
 	url: "/?path=/",
@@ -108,7 +108,7 @@ var Folder = Backbone.Collection.extend({
 		var path = "";
 		var node = this;
 		while (node != null) {
-			path = "/"+node.folderName + path;
+			path = pathJoin("/",node.folderName,path);
 			node = node.parentFolder;
 		}
 		return path;

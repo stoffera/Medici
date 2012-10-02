@@ -1,3 +1,9 @@
+/**
+* Medici
+* Copyright (c) 2012 Kristoffer Andersen
+* All right reserved
+*/
+
 /** Server listen port */
 var serverPort = 8080;
 

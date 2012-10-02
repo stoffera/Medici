@@ -2,6 +2,8 @@
 <html>
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<meta name="author" content="Kristoffer Andersen">
+		<meta name="copyright" content="&copy; 2012 Kristoffer Andersen">
 		<title>Thoms videos</title>
 		<link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
 		<link href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css" rel="stylesheet">
@@ -51,7 +53,7 @@
 		}
 		
 		.nocover {
-			background-image: -webkit-linear-gradient(#EEE, #555);
+			background-image: -webkit-linear-gradient(#DDD, #666);
 			height: 170px;
 			width: 119px;
 			border: 1px solid #444;
@@ -61,8 +63,11 @@
 		}
 		.cover {
 			height: 170px;
-			max-width: 119px !important;
+			width: 119px !important;
 			border: 1px solid #444;
+			background-image: url(img/spinner_small.gif);
+			background-position: center;
+			background-repeat: no-repeat;
 		}
 		
 		.thumbnails > li {
@@ -91,7 +96,7 @@
 				<h3 id="nowPlaying"></h3>
 				<video id="videoPlayer" width="640" height="380" controls></video>
 			</div>
-			<div class="navbar navbar-inverse navbar-fixed-top">
+			<div class="navbar navbar-inverse">
 			  <div class="navbar-inner">
 				<ul class="nav">
 				  <li><p class="navbar-text">&nbsp;&nbsp;&nbsp;</p></li>
@@ -101,9 +106,7 @@
 			</div>
 			<ul id="breadcrumbs" class="breadcrumb">
 				<li><a href="javascript:void(0)">Film</a></li>
-				
 			</ul>
-			<!--button id="backBtn" class="btn">&#x2190; Back</button-->
 			<div class="row-fluid">
 				<div class="span2">
 					<ul id="filelist" class="nav nav-list well"></ul>

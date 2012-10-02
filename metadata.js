@@ -1,3 +1,9 @@
+/**
+* Medici
+* Copyright (c) 2012 Kristoffer Andersen
+* All right reserved
+*/
+
 var procs = require('child_process');
 
 var openFiles = {};

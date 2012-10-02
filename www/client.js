@@ -1,8 +1,104 @@
-var currentDir = "";
+/**
+* Medici
+* Copyright (c) 2012 Kristoffer Andersen
+* All right reserved
+*/
+
+/**
+* Copied from node.js source
+*/
+var pathJoin = function() {
+	var paths = Array.prototype.slice.call(arguments, 0);
+	return normalize(paths.filter(function(p, index) {
+		return p && typeof p === 'string';
+	}).join('/'));
+};
+
+/**
+* Copied from node.js source
+*/
+var normalize = function(path) {
+	var isAbsolute = path.charAt(0) === '/',
+    	trailingSlash = path.substr(-1) === '/';
+
+	// Normalize the path
+	path = normalizeArray(path.split('/').filter(function(p) {
+		return !!p;
+	}), !isAbsolute).join('/');
+
+	if (!path && !isAbsolute) {
+		path = '.';
+	}
+	if (path && trailingSlash) {
+		path += '/';
+	}
+
+	return (isAbsolute ? '/' : '') + path;
+};
+
+/**
+* Copied from node.js
+*/
+function normalizeArray(parts, allowAboveRoot) {
+  // if the path tries to go above the root, `up` ends up > 0
+  var up = 0;
+  for (var i = parts.length - 1; i >= 0; i--) {
+    var last = parts[i];
+    if (last === '.') {
+      parts.splice(i, 1);
+    } else if (last === '..') {
+      parts.splice(i, 1);
+      up++;
+    } else if (up) {
+      parts.splice(i, 1);
+      up--;
+    }
+  }
+
+  // if the path is allowed to go above the root, restore leading ..s
+  if (allowAboveRoot) {
+    for (; up--; up) {
+      parts.unshift('..');
+    }
+  }
+
+  return parts;
+}
+
+var bind = function(func, context, param) {
+	return function(){func.call(context, param);};
+};
+
+var rootFolder = null;
 var currentVideoUrl = null;
+
+var playFile = function(filepath, name) {
+	var player = $('#videoPlayer');
+	var c_match = document.cookie.match(/(medici-session=\d+)/);
+	if (currentVideoUrl != filepath+"?"+c_match[1]) {
+		$('#nowPlaying').text(name);
+		player.attr('src',pathJoin('/video/',filepath+"?"+c_match[1]));
+		currentVideoUrl = pathJoin('/video/',filepath+"?"+c_match[1]);
+	}
+	$('#player').addClass('active');
+	$('#backdrop').addClass('active');
+	player[0].play();
+};
+
+var hideVideo = function() {
+	var player = $('#videoPlayer');
+	player[0].pause();
+	$('#player').removeClass('active');
+	$('#backdrop').removeClass('active');
+};
+
+// DEPRECATED CODE
+
+var currentDir = "";
 var activeLi = null;
 
 var createLi = function(filename) {
+	console.error("createLi is deprecated");
 	var m = filename.toLowerCase().match(/\.(mp4|m4v|mov)$/);
 	var m2 = filename.toLowerCase().match(/\.(avi|flv|mkv)$/);
 	var icon = "";
@@ -31,6 +127,7 @@ var createLi = function(filename) {
 };
 
 var getMetadata = function(file, titleDom, durationDom) {
+	console.error("getMetadata is deprecated");
 	$.getJSON("/metadata/"+file, function(data){
 		if (data['title'] != null) {
 			titleDom.empty();
@@ -49,6 +146,7 @@ var getMetadata = function(file, titleDom, durationDom) {
 };
 
 var clickHandler = function(evnt) {
+	console.error("clickHandler is deprecated");
 	if (activeLi != null)
 		activeLi.removeClass('active');
 	var link = evnt.currentTarget;
@@ -73,27 +171,8 @@ var clickHandler = function(evnt) {
 	}
 };
 
-var playFile = function(filename, name) {
-	var player = $('#videoPlayer');
-	var c_match = document.cookie.match(/(nbrow-session=\d+)/);
-	if (currentVideoUrl != '/?video=/'+currentDir+'/'+filename+"?"+c_match[1]) {
-		$('#nowPlaying').text(name);
-		player.attr('src','/video/'+currentDir+'/'+filename+"?"+c_match[1]);
-		currentVideoUrl = '/video/'+currentDir+'/'+filename+"?"+c_match[1];
-	}
-	$('#player').addClass('active');
-	$('#backdrop').addClass('active');
-	player[0].play();
-};
-
-var hideVideo = function() {
-	var player = $('#videoPlayer');
-	player[0].pause();
-	$('#player').removeClass('active');
-	$('#backdrop').removeClass('active');
-};
-
 var goBack = function() {
+	console.error("goBack is deprecated");
 	if (currentDir == '')
 		return;
 	
@@ -106,6 +185,7 @@ var goBack = function() {
 };
 
 var fetchCurDir = function() {
+	console.error("fetchCurDir is deprecated");
 	$('#list').empty();
 	$.getJSON('/?path=/'+currentDir,function(data){
 		parseDir(data);
@@ -113,6 +193,7 @@ var fetchCurDir = function() {
 };
 
 var parseDir = function(data) {
+	console.error("parseDir is deprecated");
 	if (data.length>0) {
 		data.sort();
 		var list = $('#list').empty();
@@ -122,26 +203,3 @@ var parseDir = function(data) {
 		}
 	}	
 };
-
-var pathJoin = function(part1, part2) {
-	if (part1.match(/\/$/) == null && part2.match(/^\//) == null) {
-		return part1+"/"+part2;
-	}
-	else {
-		return part1+part2;
-	}
-};
-
-var bind = function(func, context, param) {
-	return function(){func.call(context, param);};
-};
-
-var rootFolder = null;
-
-// $(document).ready(function(evnt){
-// 	rootFolder = new Folder();
-// 	rootFolder.fetch();
-// 	
-// 	$('#backBtn').click(goBack);
-// 	$('#backdrop').click(hideVideo);
-// });

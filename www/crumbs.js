@@ -1,3 +1,8 @@
+/**
+* Medici
+* Copyright (c) 2012 Kristoffer Andersen
+* All right reserved
+*/
 
 crumbManager = function(crumbsListEl) {
 	this.crumbEl = crumbsListEl;
