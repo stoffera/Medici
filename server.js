@@ -44,14 +44,14 @@ var staticServe = function(url,req,res) {
 	if (url.pathname == '/')
 		url.pathname = 'index.htm';
 	
-	n.fs.exists(n.path.join('static',url.pathname),function(exists){
+	n.fs.exists(n.path.join('www',url.pathname),function(exists){
 		if (!exists) {
 			res.writeHead(404);
 			res.end("File not found!");
 			return;
 		}
 		else {
-			serveFile(n.path.join('static',url.pathname), req , res);
+			serveFile(n.path.join('www',url.pathname), req , res);
 		}
 	});
 };
@@ -246,20 +246,20 @@ var initSession = function(req, res) {
 			var c = c_array[i].split('=');
 			cookies[c[0]] = c[1];
 		}
-		if (cookies['nbrow-session'] != undefined && sessions[cookies['nbrow-session']] != undefined) {
-			req.currentSession = sessions[cookies['nbrow-session']];
+		if (cookies['medici-session'] != undefined && sessions[cookies['medici-session']] != undefined) {
+			req.currentSession = sessions[cookies['medici-session']];
 			return;
 		}
 	}
 	var url = n.url.parse(req.url, true);
-	if (url.query && url.query['nbrow-session'] && sessions[url.query['nbrow-session']] != undefined) {
-		req.currentSession = sessions[url.query['nbrow-session']];
+	if (url.query && url.query['medici-session'] && sessions[url.query['medici-session']] != undefined) {
+		req.currentSession = sessions[url.query['medici-session']];
 		return;
 	}
 	
 	//setup a new session
 	var newSesUID = Math.random().toString().substring(2);
-	res.setHeader('Set-Cookie','nbrow-session='+newSesUID);
+	res.setHeader('Set-Cookie','medici-session='+newSesUID);
 	sessions[newSesUID] = {'id':newSesUID, 'cnt':1};
 	req.currentSession = sessions[newSesUID];
 };
@@ -338,7 +338,7 @@ var checkLogin = function(req, res) {
 
 var requestListener = function(req, res) {
 	var url = n.url.parse(req.url, true);
-	res.setHeader('Server','nBrowse');
+	res.setHeader('Server','medici_0.2B');
 	
 	initSession(req,res);
 	logRequest(req);
