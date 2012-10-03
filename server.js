@@ -108,70 +108,95 @@ var serveVideo = function(urlmatch, req, res) {
 var serveFile = function(filePath, req, res, opt_attachment) {
 	if (!opt_attachment) opt_attachment = false;
 	
-	var stat = n.fs.statSync(filePath);
-	var start = 0;
-	var partial = false;
-	var end = parseInt(stat.size,10)-1;
-	var fileType = n.path.extname(filePath).substr(1);
-	
-	//Setup header
-	var header = {
-		'Cache-Control': 'public',
-		Connection: 'keep-alive',
-		'Last-Modified': stat.mtime,
-		'Content-Type': mimeTypes[fileType],
-		'Content-Disposition': (opt_attachment?'attachment':'inline')+'; filename='+n.path.basename(filePath)
-	};
-	
-	//Http Cache control
-	var etag = stat.size + "-" + Date.parse(stat.mtime);
-	if (req.headers['if-none-match'] === etag) {
-		res.writeHead(304,header);
-		res.end();
-		return;
-	}
-	else {
-		header['ETag'] = etag;
-	}
-	
-	if (req.headers['range']) {
-		var match = req.headers.range.match(/bytes=(\d+)-(\d*)/);
-		partial = true;
-		start = parseInt(match[1],10);
-		if (match[2] != undefined && match[2] != '')
-			end = parseInt(match[2],10);
-	}
-	var length = end - start + 1;
-	var stream = n.fs.createReadStream(filePath,{
-		flags: 'r',
-		encoding: null,
-		fd: null,
-		start: start,
-		end: end,
-		bufferSize:64*1064
-	});
-	if (stream) {
-		//console.log("Starting streaming: "+file+", offset at: "+start+" until: "+end+", length: "+length);
+	//Get the file details
+	n.fs.stat(filePath, function(err,stat){
 		
-		if (partial) {
-			header.Status = "206 Partial Content";
-			header['Accept-Ranges'] = 'bytes';
-			header['Content-Range'] = 'bytes '+start+"-"+end+"/"+stat.size;
+		//abort if error
+		if (err) {
+			console.error("Could not get file stat: "+err);
+			res.writeHead(500);
+			res.end("FS err");
+			return;
 		}
 		
-		header.Pragma = 'public';
-		header['Content-Transfer-Encoding'] = 'binary';
-		header['Content-Length'] = length;
+		//Async we have file details, setup response headers
+		var start = 0;
+		var partial = false;
+		var end = parseInt(stat.size,10)-1;
+		var fileType = n.path.extname(filePath).substr(1);
+	
+		//Setup header
+		var header = {
+			'Cache-Control': 'public',
+			Connection: 'keep-alive',
+			'Last-Modified': stat.mtime,
+			'Content-Type': mimeTypes[fileType],
+			'Content-Disposition': (opt_attachment?'attachment':'inline')+'; filename='+n.path.basename(filePath)
+		};
+	
+		//Http Cache control
+		var etag = stat.size + "-" + Date.parse(stat.mtime);
+		if (req.headers['if-none-match'] === etag) {
+			res.writeHead(304,header);
+			res.end();
+			return;
+		}
+		else {
+			header['ETag'] = etag;
+		}
+	
+		if (req.headers['range']) {
+			var match = req.headers.range.match(/bytes=(\d+)-(\d*)/);
+			partial = true;
+			start = parseInt(match[1],10);
+			if (match[2] != undefined && match[2] != '')
+				end = parseInt(match[2],10);
+		}
+		var length = end - start + 1;
+		var stream = n.fs.createReadStream(filePath,{
+			flags: 'r',
+			encoding: null,
+			fd: null,
+			start: start,
+			end: end,
+			bufferSize:64*1064
+		});
+		if (stream) {
+			//console.log("Starting streaming: "+file+", offset at: "+start+" until: "+end+", length: "+length);
 		
-		res.writeHead((start==0?200:206),header);
-		stream.pipe(res);
-	}
+			if (partial) {
+				header.Status = "206 Partial Content";
+				header['Accept-Ranges'] = 'bytes';
+				header['Content-Range'] = 'bytes '+start+"-"+end+"/"+stat.size;
+			}
+		
+			header.Pragma = 'public';
+			header['Content-Transfer-Encoding'] = 'binary';
+			header['Content-Length'] = length;
+		
+			res.writeHead((start==0?200:206),header);
+			stream.pipe(res);
+		}
+	});
 };
 
 var getMetadata = function(match, req, res) {
 	var file = n.querystring.unescape(match[1]);
 	var output;
 	var absFile = n.path.join(browseDir,file);
+	
+	//Check meta cache
+	n.fs.exists(n.path.join("meta-cache",n.path.basename(absFile)),function(ext){
+		if (ext) {
+			serveFile(n.path.join("meta-cache",n.path.basename(absFile)), req, res);
+		}
+		else {
+			extractMetadata(absFile, req, res);
+		}
+	});
+};
+
+var extractMetadata = function(absFile, req, res) {
 	n.metadata.getTitle(absFile, function(title){
 		output = {title: title};
 		
@@ -187,9 +212,13 @@ var getMetadata = function(match, req, res) {
 					
 					n.metadata.hasCoverArt(absFile,function(cover){
 						output['cover'] = cover;
+						//Cache the metadata in a file
+						var jsonStr = JSON.stringify(output);
+						n.fs.writeFile( n.path.join("meta-cache/",n.path.basename(absFile)), jsonStr );
 						
+						//return the data
 						res.writeHead(200, {'Content-Type':'application/json'});
-						res.end(JSON.stringify(output));
+						res.end(jsonStr);
 					});
 				});
 			});
