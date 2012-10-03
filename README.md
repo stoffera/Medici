@@ -45,6 +45,15 @@ When the medici files are located in a folder (eg. `medici`), open the file node
 
 Save the changes and run `node server.js` from you terminal.
 
+Supported Browsers
+==================
+Browsers that can playback MP4 files (either h.264, MPEG4 or likewise) are supported. Medici is only tested on WebKit browsers (Safari & Chrome).  
+In theory these browsers should work:
+* Safari
+* Chrome
+* Opera
+* Internet Explorer 9 and 10
+
 Run as daemon
 =============
 Should you get tired of running the node server process in the terminal or in a screen, you can easily install it as a daemon. The newest Ubuntu include the new [Upstart](http://upstart.ubuntu.com) daemon initialization system. Here it is fairly easy to run a script as a daemon.
