@@ -26,13 +26,13 @@ var ThumbListView = Backbone.View.extend({
 		this.filterInput = el;
 		
 		//Attach event listeners to new input field
-		this.filterInput.bind("keyup keydown",bind(function(){
+		this.filterInput.bind("keyup",bind(function(){
 			this.render();
 		},this));
 	},
 	
 	render: function() {
-		//console.log("view render");
+		//console.log("thumb list render");
 		this.$el.empty();
 		
 		if (!this.model.isLoaded) {
@@ -49,6 +49,8 @@ var ThumbListView = Backbone.View.extend({
 				notits.remove();
 			});
 		}
+		
+		this.model.sort();
 		
 		var model;
 		var row = $('<div></div>').addClass('row-fluid');
@@ -68,7 +70,7 @@ var ThumbListView = Backbone.View.extend({
 				row = $('<div></div>').addClass('row-fluid');
 			}
 			
-			row.append(model.attachedThumbView.el);
+			row.append(model.attachedThumbView.render());
 			cnt++;
 		}
 		//Apped any remaining row
@@ -141,8 +143,7 @@ var ThumbView = Backbone.View.extend({
 		link.append(div);
 		this.$el.append(link);
 		
-		var self = this;
-		div.click(function(evnt){self.play();});
+		div.click( bind(this.play, this) );
 		
 		return this.$el;
 	},
@@ -176,7 +177,7 @@ var ThumbView = Backbone.View.extend({
 	},
 	
 	play: function() {
-		var link = this.model.get('path')+'/'+this.model.get("filename");
+		var link = pathJoin(this.model.get('path'),this.model.get("filename"));
 		if (!link) {
 			console.error("no video link!");
 			return;

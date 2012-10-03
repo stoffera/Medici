@@ -12,6 +12,7 @@ var VideoModel = Backbone.Model.extend({
 	videoRegexp : new RegExp("\\.(mp4|m4v|mov)$"),
 	invalidRegexp : new RegExp("\\.(avi|flv|mkv)$"),
 	iconName : "icon-film",
+	isValid: null,
 	
 	initialize : function() {
 		//Check if video format is OK
@@ -21,14 +22,17 @@ var VideoModel = Backbone.Model.extend({
 		
 		if (m1 && m1[1]) {
 			//Video is OK, fetch extended info
+			this.isValid = true;
 			this.loadMetadata();
 		}
 		else if (m2 && m2[1]) {
 			//Video is not OK
 			console.log(this.get("filename")+" is not a valid HTML5 video!");
+			this.isValid = false;
 		}
 		else {
 			console.error(this.get("filename")+" is an unknown type!");
+			this.isValid = false;
 		}
 	},
 	
@@ -83,8 +87,6 @@ var Folder = Backbone.Collection.extend({
 		this.subFolders = new Array();
 		this.isLoaded = false;
 		
-		//Re sort the collection on every change
-		this.on('add remove change',this.sort, this);
 	},
 	
 	add : function(objects) {
@@ -94,8 +96,11 @@ var Folder = Backbone.Collection.extend({
 				
 				//This collection has data ready
 				this.isLoaded = true;
+				var newModel = new VideoModel(objects[o]);
 				
-				Backbone.Collection.prototype.add.call(this, new VideoModel(objects[o]));
+				//skip if model is not a valid video file
+				if (!newModel.isValid) continue;
+				Backbone.Collection.prototype.add.call(this, newModel,{silent:true});
 			}
 			else {
 				var folder = new Folder();
@@ -105,6 +110,7 @@ var Folder = Backbone.Collection.extend({
 				this.subFolders.push(folder);
 			}
 		}
+		this.trigger('add');
 	},
 	
 	getPath: function() {

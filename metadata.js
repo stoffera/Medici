@@ -99,8 +99,13 @@ exports.hasCoverArt = function(fileStr, callback) {
 };
 
 exports.getCover = function(fileStr, callback) {
-	procs.exec("MP4Box -dump-cover '"+fileStr+"'",function(err,stdout,stderr){
-		callback("ok");
+	procs.exec("MP4Box -dump-cover \""+fileStr+"\"",function(err,stdout,stderr){
+		if (err) {
+			console.error("Error on extracting cover art from: "+fileStr);
+			console.log(err+": "+stderr+"\n"+stdout);
+			callback(false);
+		}
+		else callback(true);
 	});
 };
 

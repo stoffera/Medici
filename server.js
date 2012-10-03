@@ -238,16 +238,23 @@ var coverart = function(match, req, res) {
 			serveFile(cachefile, req, res);
 		}
 		else {
-			console.log("dumping cover art for "+file);
-			n.metadata.getCover(absFile, function() {
+			n.metadata.getCover(absFile, function(success) {
+				//check for error
+				if (!success) {
+					res.writeHead(500,{'Content-Type':'text/plain'});
+					res.end("Coverart could be extracted, an error occured.");
+					return;
+				}
+				
 				var m = absFile.match(/^(.+)\.[\w\d]+$/);
-				n.proc.exec("mv '"+m[1]+".png' '"+cachefile+"'",function(err,stdout,stderr){
+				n.proc.exec("mv \""+m[1]+".png\" \""+cachefile+"\"",function(err,stdout,stderr){
 					//Upon error abort
 					if (err!=null) {
-						res.end();
+						console.log("Cover could not be moved to cache location: "+cachefile);
+						res.writeHead(500,{'Content-Type':'text/plain'});
+						res.end("Coverart could not be moved to cache location");
 						return;
 					}
-					console.log("move cover art stat: "+stdout+stderr);
 					
 					//resize the image
 					n.im.resize({
@@ -266,7 +273,6 @@ var coverart = function(match, req, res) {
 						serveFile(cachefile, req, res);
 					});
 				});
-				console.log("cover art extracted");
 			});
 		}
 	});
