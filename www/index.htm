@@ -103,6 +103,9 @@
 				  <li><p class="navbar-text">&nbsp;&nbsp;&nbsp;</p></li>
 			      <li class=""><span class="brand">Medici Media Browser</span></li>
 			    </ul>
+				<div class="navbar-search pull-right">
+					<input type="search" class="search-query" id="filterTxt" placeholder="Search current folder..." />
+				</div>
 			  </div>
 			</div>
 			<ul id="breadcrumbs" class="breadcrumb">
@@ -128,12 +131,17 @@
 			rootFolder = new Folder();
 			rootFolder.fetch();
 			var thumbs = new ThumbListView({model: rootFolder, el: $('#thumblist')});
+			thumbs.setFilterInput($('#filterTxt'));
+			
 			var rootListView = new FolderListView({model: rootFolder, el: $('#filelist')});
 			rootListView.thumbs = thumbs;
 			rootListView.render();
 			thumbs.render();
 			
 			$('#backdrop').click(hideVideo);
+			
+			
+			
 		});
 		
 		//var bc = new crumbs($('breadcrumbs'));

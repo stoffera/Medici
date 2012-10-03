@@ -11,9 +11,24 @@
 var ThumbListView = Backbone.View.extend({
 	tagName: 'ul',
 	className: 'thumbnails',
+	curFilterText: null,
+	filterInput: null,
 	
 	initialize: function() {
 		this.model.on('add remove',this.render,this);
+	},
+	
+	setFilterInput: function(el) {
+		if (this.filterInput) {
+			this.filterInput.unbind("keyup");
+			this.filterInput.unbind("keydown");
+		}
+		this.filterInput = el;
+		
+		//Attach event listeners to new input field
+		this.filterInput.bind("keyup keydown",bind(function(){
+			this.render();
+		},this));
 	},
 	
 	render: function() {
@@ -24,25 +39,40 @@ var ThumbListView = Backbone.View.extend({
 			this.renderSpinner();
 			return this.$el;
 		}
+		//if filter add notification
+		if (this.filterInput && this.filterInput[0].value != "") {
+			var notits = $('<div></div>').addClass('alert alert-info');
+			var cloBtn = $('<button>x</button>').addClass('close');
+			notits.append(cloBtn,document.createTextNode("A "),$('<strong>Filter</strong>'),document.createTextNode(" is currently active."));
+			this.$el.append(notits);
+			cloBtn.click(function(evt){
+				notits.remove();
+			});
+		}
 		
-		this.model.sort();
 		var model;
 		var row = $('<div></div>').addClass('row-fluid');
+		var cnt = 0;
 		for (var m=0; m<this.model.length; m++) {
 			model = this.model.at(m);
+			
+			// skip if the model does not match the filter
+			if (!this.filter(model)) continue;
+			
 			if (!model.attachedThumbView) {
 				model.attachedThumbView = new ThumbView({model: model});
 			}
 			
-			if (m > 0 && m % 4 == 0) {
+			if (cnt > 0 && cnt % 4 == 0) {
 				this.$el.append(row);
 				row = $('<div></div>').addClass('row-fluid');
 			}
 			
 			row.append(model.attachedThumbView.el);
+			cnt++;
 		}
 		//Apped any remaining row
-		if (this.model.length-1 % 4 != 0) this.$el.append(row);
+		if (cnt % 4 != 0) this.$el.append(row);
 		
 		return this.$el;
 	},
@@ -58,7 +88,19 @@ var ThumbListView = Backbone.View.extend({
 		this.model.off('add remove',this.render,this);
 		this.model = model;
 		this.model.on('add remove',this.render,this);
+		this.filterInput[0].value = "";
 		this.render();
+	},
+	
+	filter: function(model) {
+		if (this.filterInput == null || this.filterInput[0].value == "") return true;
+		var filt = new RegExp(this.filterInput[0].value.toLowerCase());
+		var m1 = model.get('title') ? model.get('title').toLowerCase().match(filt) : null;
+		var m2 = model.get('album') ? model.get('album').toLowerCase().match(filt) : null;
+		var m3 = model.get('filename') ? model.get('filename').toLowerCase().match(filt) : null;
+		
+		if (m1 || m2 || m3) return true;
+		else return false;
 	}
 });
 

@@ -82,6 +82,9 @@ var Folder = Backbone.Collection.extend({
 		this.folderName = '';
 		this.subFolders = new Array();
 		this.isLoaded = false;
+		
+		//Re sort the collection on every change
+		this.on('add remove change',this.sort, this);
 	},
 	
 	add : function(objects) {
