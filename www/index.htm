@@ -25,32 +25,42 @@
 			border-radius: 8px;
 			color: #CCC;
 			-webkit-box-shadow: 0px 0px 8px #888;
+			position: relative;
+			z-index: 10;
+			width: 640px;
+			margin-left: auto;
+			margin-right: auto;
+			top: 10%;
 		}
 		#player h3 {
 			padding: 10px;
 		}
 		#player.active {
 			display: block;
-			position: fixed;
-			margin-left: auto;
-			margin-right: auto;
-			top: 10%;
-			z-index: 10;
-			
 		}
 		#backdrop {
+			-webkit-transition: opacity 0.5s ease;
+			opacity: 0;
 			display: none;
 			position: fixed;
 			left: 0;
 			top: 0;
 			width: 100%;
 			height: 100%;
-			background-color: #333;
-			opacity: 0.8;
 		}
 		#backdrop.active {
+			-webkit-transition: opacity 0.5s ease;
+			opacity: 1;
 			display: block;
 			cursor: pointer;
+		}
+		#curtain {
+			opacity: 0.8;
+			background-color: #333;
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			z-index: 1;
 		}
 		
 		.nocover {
@@ -93,10 +103,6 @@
 	</head>
 	<body>
 		<div class="container-fluid">
-			<div id="player">
-				<h3 id="nowPlaying"></h3>
-				<video id="videoPlayer" width="640" height="380" controls></video>
-			</div>
 			<div class="navbar navbar-inverse">
 			  <div class="navbar-inner">
 				<ul class="nav">
@@ -124,7 +130,13 @@
 			
 			</ul-->
 		</div>
-		<div id="backdrop"></div>
+		<div id="backdrop">
+			<div id="curtain"></div>
+			<div id="player">
+				<h3 id="nowPlaying"></h3>
+				<video id="videoPlayer" width="640" height="380" controls></video>
+			</div>
+		</div>
 		<script type="text/javascript" charset="utf-8">
 		
 		$(document).ready(function(evnt){
@@ -138,10 +150,7 @@
 			rootListView.render();
 			thumbs.render();
 			
-			$('#backdrop').click(hideVideo);
-			
-			
-			
+			$('#curtain').click(hideVideo);
 		});
 		
 		//var bc = new crumbs($('breadcrumbs'));
