@@ -38,7 +38,7 @@ var getMetadata = function(match, req, res) {
 	m.fs.exists(m.path.join("meta-cache",m.path.basename(absFile)),function(ext){
 		if (ext) {
 			res.setHeader('Content-Type','application/json');
-			server.serveFile(m.path.join("meta-cache",m.path.basename(absFile)), req, res, false);
+			server.serveFile(m.path.join("meta-cache",m.path.basename(absFile)), req, res, true);
 		}
 		else {
 			extractMetadata(absFile, req, res);
@@ -64,7 +64,12 @@ var extractMetadata = function(absFile, req, res) {
 						output['cover'] = cover;
 						//Cache the metadata in a file
 						var jsonStr = JSON.stringify(output);
-						m.fs.writeFile( m.path.join("meta-cache/",m.path.basename(absFile)), jsonStr );
+						var cacheFile =  m.path.join("meta-cache/",m.path.basename(absFile));
+						m.fs.writeFile( cacheFile, jsonStr , function(err){
+							if (err) {
+								console.error("Could bot create metadata cache file: "+cacheFile+": "+err);
+							}
+						});
 						
 						//return the data
 						res.writeHead(200, {'Content-Type':'application/json'});

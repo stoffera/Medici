@@ -74,7 +74,7 @@ var ThumbListView = Backbone.View.extend({
 			cnt++;
 		}
 		//Apped any remaining row
-		if (cnt % 4 != 0) this.$el.append(row);
+		if ((cnt-1) % 4 != 0) this.$el.append(row);
 		
 		return this.$el;
 	},
