@@ -104,7 +104,7 @@ var Folder = Backbone.Collection.extend({
 			}
 			else {
 				var folder = new Folder();
-				folder.url = this.url + objects[o].filename;
+				folder.url = pathJoin(this.url, objects[o].filename);
 				folder.folderName = objects[o].filename;
 				folder.parentFolder = this;
 				this.subFolders.push(folder);
