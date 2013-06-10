@@ -1,0 +1,17 @@
+{
+  "author": "Kristoffer Andersen",
+  "name": "Medici",
+  "version": "0.1.0",
+  "homepage": "https://github.com/stoffera/Medici",
+  "bugs": "https://github.com/stoffera/Medici/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stoffera/Medici"
+  },
+  "dependencies": {
+    "ImageMagick": "*"
+    },
+  "devDependencies": {
+    "ImageMagick": "*"
+  }
+}
