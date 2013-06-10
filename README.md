@@ -1,4 +1,4 @@
-Medici 0.2 BETA
+Medici
 ======
 
 ###HTML5 Media Library Browser and video player
