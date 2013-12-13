@@ -67,6 +67,32 @@ var Folder = Backbone.Collection.extend({
 	isLoaded: null,
 	
 	comparator: function(video1, video2) {
+
+		// // movie <-> movie
+		// if (video1.get('type') == 'movie' && video2.get('type') == 'movie') {
+		// 	if (video1.get('title') && video2.get('title')) {
+
+		// 	}
+		// 	else {
+		// 		if (video1.get('filename') < video2.get('filename')) return -1;
+		// 	}
+		// }
+
+		// // tvshow <-> movie
+		// if (video1.get('type') == 'tvshow' && video2.get('type') == 'movie') {
+
+		// }
+
+		// // movie <-> tvshow
+		// if (video1.get('type') == 'movie' && video2.get('type') == 'tvshow') {
+
+		// }
+
+		// // tvshow <-> tvshow
+		// if (video1.get('type') == 'tvshow' && video2.get('type') == 'tvshow') {
+
+		// }
+
 		var t1 = video1.get('album') ? video1.get('album') : "";
 		t1 += video1.get('album') && video1.get('track') ? video1.get('track') : "";
 		t1 += video1.get('title') ? video1.get('title') : video1.get('filename');
@@ -77,6 +103,15 @@ var Folder = Backbone.Collection.extend({
 		t2 += video2.get('title') ? video2.get('title') : video2.get('filename');
 		t2 = t2.toLowerCase();
 		
+		//tv show sorting?
+		if (video1.get('album') && video1.get('album').search(/Season \d+$/) != -1 && 
+			video2.get('album') && video2.get('album').search(/Season \d+$/) != -1) {
+			var t1m = video1.get('album').match(/(\d+)$/);
+			var t2m = video2.get('album').match(/(\d+)$/);
+			t1 = parseInt(t2m[1],10);
+			t2 = parseInt(t1m[1],10);
+		}
+
 		if (t1 < t2) return -1;
 		else if (t1 > t2) return 1;
 		else return 0;
