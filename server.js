@@ -56,6 +56,14 @@ var extractMetadata = function(absFile, req, res) {
 			m.metadata.getAlbum(absFile, function(album){
 				
 				output['album'] = album;
+				if (album) {
+					var sm = album.match(/Season (\d+)$/);
+					output['type'] = "tvshow";
+					if (sm) 
+						output['season'] = parseInt(sm[1],10);
+				}
+				else
+					output['type'] = "movie";
 				
 				m.metadata.getTrackNo(absFile, function(track){
 					output['track'] = track;
