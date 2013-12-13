@@ -5,7 +5,7 @@
 */
 
 /** Server listen port */
-var serverPort = 8080;
+var serverPort = 8000;
 
 /** Media Directory to serve: */
 var browseDir = "/home/public/Film";
@@ -211,7 +211,7 @@ var server = m.duality.createServer(staticFiles,routes,{
 	serverString: "medici",
 	sessionIdentifier: "medici-session",
 	serverPort: serverPort,
-	useAccessControl: true,
+	useAccessControl: false,
 	accessResourceCallback: checkAccess,
 	httpAuthUserLookupCallback: httpAuth,
 	httpAuthLoginSuccessCallback: httpLoginSuccess
