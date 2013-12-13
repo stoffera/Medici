@@ -112,7 +112,7 @@ var ThumbListView = Backbone.View.extend({
 */
 var ThumbView = Backbone.View.extend({
 	tagName: 'div',
-	className: 'col-xs-6 col-md-3',
+	className: 'col-xs-6 col-md-6 col-md-3',
 	
 	initialize: function() {
 		this.model.on('change',this.render,this);
@@ -157,7 +157,7 @@ var ThumbView = Backbone.View.extend({
 			title.append(track);
 			title.append(" "+this.model.get('title'));
 		}
-		var dur = $('<small></small>').addClass('label').text(this.model.get('duration'));
+		var dur = $('<small></small>').addClass('label label-default').text(this.model.get('duration'));
 		container.append(series,title,dur);
 	},
 	
@@ -170,7 +170,7 @@ var ThumbView = Backbone.View.extend({
 		
 		var dur = this.model.get('duration');
 		if (dur != null) {
-			var durationEl = $('<small class="label"></small>').text(dur);
+			var durationEl = $('<small class="label label-default"></small>').text(dur);
 			container.append(durationEl);
 		}
 
@@ -210,7 +210,7 @@ var FolderListView = Backbone.View.extend({
 	
 	render: function() {
 		this.$el.empty();
-		this.$el.append($("<li></li>").addClass("list-header").text("Folders"));
+		//this.$el.append($("<li></li>").addClass("list-header").text("Folders"));
 		
 		for (var f in this.model.subFolders) {
 			var link = $("<a></a>").attr('href','javascript:void(0);').text(this.model.subFolders[f].folderName);
