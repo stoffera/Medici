@@ -53,7 +53,7 @@ var ThumbListView = Backbone.View.extend({
 		this.model.sort();
 		
 		var model;
-		var row = $('<div></div>').addClass('row-fluid');
+		var row = $('<div></div>').addClass('row');
 		var cnt = 0;
 		for (var m=0; m<this.model.length; m++) {
 			model = this.model.at(m);
@@ -67,7 +67,7 @@ var ThumbListView = Backbone.View.extend({
 			
 			if (cnt > 0 && cnt % 4 == 0) {
 				this.$el.append(row);
-				row = $('<div></div>').addClass('row-fluid');
+				row = $('<div></div>').addClass('row');
 			}
 			
 			row.append(model.attachedThumbView.render());
@@ -111,8 +111,8 @@ var ThumbListView = Backbone.View.extend({
 * A single thumbnail related to a video
 */
 var ThumbView = Backbone.View.extend({
-	tagName: 'li',
-	className: 'span3',
+	tagName: 'div',
+	className: 'col-xs-6 col-md-3',
 	
 	initialize: function() {
 		this.model.on('change',this.render,this);
