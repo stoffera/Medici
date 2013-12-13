@@ -4,3 +4,4 @@ meta-cache/*
 .AppleDB
 .DS_Store
 *.sublime-project
+duality.js
