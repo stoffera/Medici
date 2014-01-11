@@ -144,6 +144,8 @@
 		<script type="text/javascript" charset="utf-8">
 		
 		$(document).ready(function(evnt){
+			initVideoPlayer();
+			cache = new MovieCache();
 			rootFolder = new Folder();
 			rootFolder.fetch();
 			var thumbs = new ThumbListView({model: rootFolder, el: $('#thumblist')});

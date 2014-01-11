@@ -140,6 +140,15 @@ var ThumbView = Backbone.View.extend({
 		if (this.model.get('album') == null) this.renderFilm(div);
 		else this.renderSeries(div);
 		
+		var seenEl = $('<span class="glyphicon" style="float:right;"></span>');
+		if (this.model.get("seen")) {
+			seenEl.addClass('glyphicon-check');
+		}
+		else {
+			seenEl.addClass('glyphicon-unchecked');
+		}
+		
+		div.append(seenEl);
 		link.append(div);
 		this.$el.append(link);
 		
@@ -183,7 +192,7 @@ var ThumbView = Backbone.View.extend({
 			return;
 		}
 		var title = this.model.get("title");
-		if (title) playFile(link, title);
+		if (title) playFile(link, title, this.model);
 		else playFile(link,link);
 	}
 	

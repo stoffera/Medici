@@ -71,9 +71,32 @@ var bind = function(func, context, param) {
 
 var rootFolder = null;
 var currentVideoUrl = null;
+var currentPlayerModel = null;
 
-var playFile = function(filepath, name) {
+var initVideoPlayer = function() {
+	var player = $("#videoPlayer");
+	player.on("timeupdate", function(evnt){
+		if (currentPlayerModel != null) {
+			var seen = (player[0].currentTime / player[0].duration) * 100;
+			currentPlayerModel.set({
+				seen: seen > 98 ? true : false,
+				lastPosition: player[0].currentTime
+			});
+		}
+	});
+};
+
+var playFile = function(filepath, name, model) {
 	var player = $('#videoPlayer');
+	currentPlayerModel = model;
+	var startPos = currentPlayerModel.get("lastPosition");
+	
+	//if more than 1 minute has been watched
+	var continuePlay = false;
+	if (startPos > 60 && !model.get("seen")) {
+		 continuePlay = window.confirm("Genoptag afspilningen fra sidst ?");
+	}
+	
 	var c_match = document.cookie.match(/(medici-session=\d+)/);
 	if (currentVideoUrl != filepath+"?"+c_match[1]) {
 		$('#nowPlaying').text(name);
@@ -83,6 +106,12 @@ var playFile = function(filepath, name) {
 	$('#player').addClass('active');
 	$('#backdrop').addClass('active');
 	player[0].play();
+	if (continuePlay) {
+		player.one("loadedmetadata",function(){
+			player[0].currentTime = startPos-5; //jump last known pos minus 5 secs
+		});
+		
+	}
 };
 
 var hideVideo = function() {

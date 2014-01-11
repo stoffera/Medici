@@ -34,6 +34,8 @@ var VideoModel = Backbone.Model.extend({
 			console.error(this.get("filename")+" is an unknown type!");
 			this.isValid = false;
 		}
+		
+		this.initHistory();
 	},
 	
 	loadMetadata : function() {
@@ -51,6 +53,32 @@ var VideoModel = Backbone.Model.extend({
 	getCoverArtUrl : function() {
 		if (!this.hasCoverArt) return null;
 		return pathJoin("/get_cover",this.get('path'),this.get('filename'));
+	},
+	
+	initHistory : function() {
+		if (Storage == undefined) {
+			//local storage is not supported in browserV
+			this.isSeen = false;
+			this.lastPosition = null;
+			return;
+		}
+		var filename = this.get("filename");
+		var cacheData = cache.get(filename) || {seen: false, position: null};
+		
+		this.set("seen", cacheData.seen);
+		this.set("lastPosition",cacheData.position);
+		
+		this.on("change:seen change:lastPosition", function(evnt){
+			cache.set(this.get("filename"), {seen: this.get("seen"), position: this.get("lastPosition")});
+		}, this);
+	},
+	
+	setSeen : function(seen) {
+		this.set("seen", seen);
+	},
+	
+	setPosition : function(pos) {
+		this.set("lastPosition", pos);
 	}
 });
 
@@ -156,5 +184,47 @@ var Folder = Backbone.Collection.extend({
 			node = node.parentFolder;
 		}
 		return path;
+	}
+});
+
+var MovieCache = Backbone.Model.extend({
+	supported: false,
+	cacheName: "mediciMovieCache",
+	initialize: function() {
+		if (Storage == undefined) {
+			this.supported = false;
+		}
+		else {
+			this.supported = true;
+		}
+	},
+	
+	get : function(path) {
+		if (this.supported) {
+			if (localStorage[path] != undefined) {
+				return localStorage[path];
+			}
+		}
+		return undefined;
+	},
+	
+	set : function(path, value) {
+		if (this.supported) {
+			localStorage[path] = value;
+			return true;
+		}
+		else {
+			return true;
+		}
+	},
+	
+	contains: function(path) {
+		if (this.supported) {
+			if (localStorage[path] != undefined) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 });
