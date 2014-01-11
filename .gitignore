@@ -5,3 +5,4 @@ meta-cache/*
 .DS_Store
 *.sublime-project
 duality.js
+node_modules
