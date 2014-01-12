@@ -63,22 +63,26 @@ var VideoModel = Backbone.Model.extend({
 			return;
 		}
 		var filename = this.get("filename");
-		var cacheData = cache.get(filename) || {seen: false, position: null};
+		var data = cache.get(filename+"") || {seen: false, position: null};
 		
-		this.set("seen", cacheData.seen);
-		this.set("lastPosition",cacheData.position);
+		this.set({seen: data.seen, lastPosition: data.position});
 		
 		this.on("change:seen change:lastPosition", function(evnt){
-			cache.set(this.get("filename"), {seen: this.get("seen"), position: this.get("lastPosition")});
+			cache.set(this.get("filename"), {seen: this.get("seen"), position: this.get("lastPosition")} );
 		}, this);
 	},
 	
-	setSeen : function(seen) {
-		this.set("seen", seen);
-	},
-	
-	setPosition : function(pos) {
-		this.set("lastPosition", pos);
+	/**
+	* Get how much of this video is watched
+	* @return {number} The completed percentage
+	*/
+	getCompletedState : function() {
+		var dur = this.get("duration");
+		if (!dur) {
+			return 0;
+		}
+		dur = dur.split(":");
+		return (this.get("lastPosition")/(dur[0]*3600+dur[1]*60+dur[2]*1))*100; //multiply by one to convert to number
 	}
 });
 
@@ -202,7 +206,7 @@ var MovieCache = Backbone.Model.extend({
 	get : function(path) {
 		if (this.supported) {
 			if (localStorage[path] != undefined) {
-				return localStorage[path];
+				return JSON.parse(localStorage[path]);
 			}
 		}
 		return undefined;
@@ -210,7 +214,7 @@ var MovieCache = Backbone.Model.extend({
 	
 	set : function(path, value) {
 		if (this.supported) {
-			localStorage[path] = value;
+			localStorage[path] = JSON.stringify(value);
 			return true;
 		}
 		else {

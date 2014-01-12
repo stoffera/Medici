@@ -140,15 +140,25 @@ var ThumbView = Backbone.View.extend({
 		if (this.model.get('album') == null) this.renderFilm(div);
 		else this.renderSeries(div);
 		
+		//insert duration label
+		var dur = $('<small></small>').addClass('label label-default').text(this.model.get('duration'));
+		div.append(dur);
+		
 		var seenEl = $('<span class="glyphicon" style="float:right;"></span>');
 		if (this.model.get("seen")) {
 			seenEl.addClass('glyphicon-check');
+			div.append(seenEl);
 		}
-		else {
-			seenEl.addClass('glyphicon-unchecked');
+		else if (this.model.get("lastPosition") > 60) {
+			var progCon = $('<div class="progress"></div>');
+			var progBar = $('<div class="progress-bar" role="progressbar"></div>');
+			progBar.width(Math.round(this.model.getCompletedState())+"%");
+			progCon.append(progBar);
+			dur.remove();
+			progBar.text(dur.text());
+			div.append(progCon);
 		}
 		
-		div.append(seenEl);
 		link.append(div);
 		this.$el.append(link);
 		
@@ -166,8 +176,8 @@ var ThumbView = Backbone.View.extend({
 			title.append(track);
 			title.append(" "+this.model.get('title'));
 		}
-		var dur = $('<small></small>').addClass('label label-default').text(this.model.get('duration'));
-		container.append(series,title,dur);
+		
+		container.append(series,title);
 	},
 	
 	renderFilm : function(container) {
@@ -176,12 +186,6 @@ var ThumbView = Backbone.View.extend({
 		
 		var header = $('<p></p>').text(title);
 		container.append(header);
-		
-		var dur = this.model.get('duration');
-		if (dur != null) {
-			var durationEl = $('<small class="label label-default"></small>').text(dur);
-			container.append(durationEl);
-		}
 
 	},
 	
