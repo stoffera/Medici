@@ -193,7 +193,7 @@ var ThumbView = Backbone.View.extend({
 		}
 		var title = this.model.get("title");
 		if (title) playFile(link, title, this.model);
-		else playFile(link,link);
+		else playFile(link,link, this.model);
 	}
 	
 });
